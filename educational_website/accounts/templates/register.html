@@ -121,6 +121,7 @@
         const canvas = document.getElementById('canvas')
         const captureButton = document.getElementById('capture-button')
         const registerForm = document.getElementById('message')
+        const messageDiv = document.getElementById('message')
 
         let capturedImage = null
 
@@ -130,6 +131,17 @@
         }).catch((err)=>{
             console.log("Error accessing your camera")
             messageDiv.innerHTML = "Camera not accessible."
+        })
+
+        captureButton.addEventListener('click',()=>{
+            if(!video.srcObject){
+                messageDiv.innerHTML = "Please allow access to your camera"
+                return
+            }
+            const context = canvas.getContext("2d")
+            context.drawImage(video,0,0,canvas.width,canvas.height)
+            capturedImage = canvas.toDataURL('image/jpeg');
+            messageDiv.innerHTML = "Face captured successfully"
         })
         
     </script>
