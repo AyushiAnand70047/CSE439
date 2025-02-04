@@ -1,23 +1,28 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose Language</title>
+    {% load static %}
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
+
 <body>
     <div class="heading">Select Your Language</div>
     <div class="sections">
-        <div class="half hindi">
+        <a href="hindi/hindi.html" class="half" onclick="speak('Hindi page is opened for you.')">
             <button class="button">हिंदी</button>
-        </div>
-        <div class="half english">
+        </a>
+
+        <!-- English Section -->
+        <a href="english/english.html" class="half" onclick="speak('English page is opened for you.')">
             <button class="button">English</button>
-        </div>
+        </a>
     </div>
-    <script src="{% static 'script.js' %}"></script>
+    <script src="{% static 'voice-navigation.js' %}"></script>
+    <script src="{% static 'voice-feedback.js' %}"></script>
 </body>
+
 </html>
