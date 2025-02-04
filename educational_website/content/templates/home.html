@@ -1,0 +1,23 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Language</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="heading">Select Your Language</div>
+    <div class="sections">
+        <div class="hover-speak half hindi" data-text="Hindi">
+            <button class="button">हिंदी</button>
+        </div>
+        <div class="hover-speak half english" data-text="English">
+            <button class="button">English</button>
+        </div>
+    </div>
+    <script src="{% static 'script.js' %}"></script>
+</body>
+</html>
