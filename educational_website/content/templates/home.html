@@ -1,28 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Language</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
+{% block title %}
+Choose Language
+{% endblock %}
 
-<body>
-    <div class="heading">Select Your Language</div>
-    <div class="sections">
-        <a href="hindi/hindi.html" class="half" onclick="speak('Hindi page is opened for you.')">
-            <button class="button">हिंदी</button>
-        </a>
+{% load static %}
+{% block style%}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+{% endblock %}
 
-        <!-- English Section -->
-        <a href="english/english.html" class="half" onclick="speak('English page is opened for you.')">
-            <button class="button">English</button>
-        </a>
-    </div>
-    <script src="{% static 'voice-navigation.js' %}"></script>
-    <script src="{% static 'voice-feedback.js' %}"></script>
-</body>
 
-</html>
+{% block content %}
+<div class="heading">Select Your Language</div>
+<div class="sections">
+    <a href="hindi/hindi.html" class="half" onclick="speak('Hindi page is opened for you.')">
+        <button class="button">हिंदी</button>
+    </a>
+
+    <!-- English Section -->
+    <a href="english/english.html" class="half" onclick="speak('English page is opened for you.')">
+        <button class="button">English</button>
+    </a>
+</div>
+<script src="{% static 'voice-navigation.js' %}"></script>
+<script src="{% static 'voice-feedback.js' %}"></script>
+{% endblock %}
