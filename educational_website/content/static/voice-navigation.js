@@ -26,9 +26,9 @@ function startVoiceRecognition() {
 // Function to handle recognized voice commands
 function handleVoiceCommand(command) {
     const actions = {
-        'go to home': '/',
-        'go to about': '/about/',
-        'go to contact': '/contact/',
+        'home': '/',
+        'about': '/about/',
+        'contact': '/contact/',
     };
 
     // Redirect to the corresponding URL if the command exists
