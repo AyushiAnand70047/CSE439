@@ -155,31 +155,42 @@
         // Handle form submission
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
-
+    
             if (!capturedImage) {
                 messageDiv.innerText = "Please capture your face first.";
                 return;
             }
-
+    
             const formData = new FormData();
             formData.append('username', document.getElementById('username').value);
             formData.append('face_image', capturedImage);
-
+    
             try {
-                const response = await fetch('/login/', {
+                messageDiv.innerText = "Verifying...";
+                
+                const response = await fetch('/accounts/login/', {
                     method: 'POST',
                     body: formData
                 });
-
+    
                 const data = await response.json();
-                if (data.success) {
-                    messageDiv.innerText = data.message || 'Login successful!';
-                } else {
-                    messageDiv.innerText = data.message || 'Login failed.';
+                messageDiv.innerText = data.message;
+    
+                if (data.status === 'success') {
+                    // Stop the video stream
+                    const stream = video.srcObject;
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    // Add delay before redirect
+                    setTimeout(() => {
+                        window.location.href = '/accounts/home/';
+                    }, 2000);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                messageDiv.innerText = 'An error occurred while processing your login.';
+                messageDiv.innerText = 'An error occurred during login.';
             }
         };
     </script>
