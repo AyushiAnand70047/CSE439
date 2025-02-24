@@ -10,7 +10,7 @@
 
 {% block content %}
 <body onclick="speak('Login Page')">
-    <div class="login-container">
+    <div class="login-container" onclick="event.stopPropagation()">
         <h2>Login with Face Recognition</h2>
         <form id="login-form">
             <input type="text" id="username" name="username" placeholder="Username" required>
