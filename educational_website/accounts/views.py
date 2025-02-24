@@ -137,7 +137,12 @@ def login_user(request):
 
     return render(request, 'login.html')
 
+# def home(request):
+#     if not request.user.is_authenticated:
+#         return redirect('login_user')
+#     return render(request, 'home.html')
+
 def home(request):
     if not request.user.is_authenticated:
         return redirect('login_user')
-    return render(request, 'home.html')
+    return redirect('content_home')

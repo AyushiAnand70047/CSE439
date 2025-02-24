@@ -1,33 +1,29 @@
-<style>
-    .parent{
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        height: 100%;
-        padding: 10px 10px;
-    }
-    .child{
-        margin: 15px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 60px;
-        background-color: #265e5e;
-        color: white;
-        cursor: pointer;
-    }
-</style>
+{% extends "layout.html" %}
 
+{% block title %}Hindi Learning{% endblock %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'learning-option.css' %}">
+{% endblock %}
+
+{% block content %}
 <div class="parent">
     <div class="child">
-        Poems
+        कविता
     </div>
     <div class="child">
-        Short Stories
+        कहानियाँ
     </div>
     <div class="child">
-        Songs
+        गीत
     </div>
     <div class="child">
-        Practice(Talk with bot)
+        अभ्यास<br>(बॉट से बात करें)
     </div>
 </div>
+
+<script src="{% static 'voice-navigation.js' %}"></script>
+<script src="{% static 'voice-feedback.js' %}"></script>
+{% endblock %}

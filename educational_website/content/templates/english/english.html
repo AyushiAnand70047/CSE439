@@ -1,1 +1,29 @@
-<h1>English Page</h1>
+{% extends "layout.html" %}
+
+{% block title %}English Learning{% endblock %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'learning-option.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="parent">
+    <div class="child">
+        Poems
+    </div>
+    <div class="child">
+        Short Stories
+    </div>
+    <div class="child">
+        Songs
+    </div>
+    <div class="child">
+        Practice<br>(Talk with bot)
+    </div>
+</div>
+
+<script src="{% static 'voice-navigation.js' %}"></script>
+<script src="{% static 'voice-feedback.js' %}"></script>
+{% endblock %}
