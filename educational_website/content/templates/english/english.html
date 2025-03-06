@@ -19,11 +19,21 @@
     <div class="child" onmouseover="speak('Songs')">
         Songs
     </div>
-    <div class="child" onmouseover="speak('Practice')">
+    <div class="child" onmouseover="speak('Practice')" onclick="redirectToVoiceGrammar()">
         Practice<br>(Talk with bot)
     </div>
 </div>
 
 <script src="{% static 'voice-navigation.js' %}"></script>
 <script src="{% static 'voice-feedback.js' %}"></script>
+<script>
+    function redirectToVoiceGrammar() {
+        try {
+            window.location.href = 'http://localhost:8000/voice-grammar/';
+        } catch(e) {
+            console.error('Redirect error:', e);
+            alert('Could not redirect. Please try navigating to http://localhost:8000/voice-grammar/ manually.');
+        }
+    }
+</script>
 {% endblock %}

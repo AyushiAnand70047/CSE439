@@ -22,5 +22,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('content/',include('content.urls'))
+    path('content/',include('content.urls')),
+    path('voice-grammar/', include('voice_grammar.urls', namespace='voice_grammar')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

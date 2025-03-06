@@ -1,7 +1,7 @@
 body {
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f9f5f9, #d3d3d3, #a9a8a8);
+    background: linear-gradient(135deg, #fefefe, #fbf8f8, #fcfcfc);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     padding: 20px;
@@ -50,7 +50,7 @@ body {
     cursor: pointer;
     border-radius: 25px;
     border: 2px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(45deg, #ddd7f4, #eabaf8, #ea98f7);
+    background: linear-gradient(45deg, #bcf5a5, #a8eba9, #aeefab);
     box-shadow: 0 10px 30px rgba(79, 172, 254, 0.25);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
