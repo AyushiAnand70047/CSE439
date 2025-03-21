@@ -10,8 +10,8 @@ def english(request):
 def hindi(request):
     return render(request,'hindi/hindi.html')
 
-def card(request):
-    videos = [
+def songs(request):
+    songs = [
         {'name': 'ABC Song', 'source': "https://www.youtube.com/embed/kpy6QEAuLJw?si=UhYZPNxlv5_yR74X"},
         {'name': 'Numbers Song', 'source': "https://www.youtube.com/embed/JT0MmZcJ2Vw?si=nC39IBQSLWUBGAIa"},
         {'name': 'Hello Song', 'source': "https://www.youtube.com/embed/gghDRJVxFxU?si=Vt39NETDuidhKM_m"},
@@ -19,4 +19,4 @@ def card(request):
         {'name': 'Numbers Song', 'source': "https://www.youtube.com/embed/JT0MmZcJ2Vw?si=nC39IBQSLWUBGAIa"},
         {'name': 'Hello Song', 'source': "https://www.youtube.com/embed/gghDRJVxFxU?si=Vt39NETDuidhKM_m"},
     ]
-    return render(request,'hindi/card.html',{'videos':videos})
+    return render(request,'english/songs.html',{'videos':songs})

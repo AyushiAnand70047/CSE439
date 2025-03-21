@@ -16,7 +16,7 @@
     <div class="child" onmouseover="speak('Short Stories')">
         Short Stories
     </div>
-    <div class="child" onmouseover="speak('Songs')">
+    <div class="child" onmouseover="speak('Songs')" onclick="redirectToSongs()">
         Songs
     </div>
     <div class="child" onmouseover="speak('Practice')" onclick="redirectToVoiceGrammar()">
@@ -27,6 +27,9 @@
 <script src="{% static 'voice-navigation.js' %}"></script>
 <script src="{% static 'voice-feedback.js' %}"></script>
 <script>
+    function redirectToSongs() {
+        window.location.href = "songs/";
+    }
     function redirectToVoiceGrammar() {
         try {
             window.location.href = 'http://localhost:8000/voice-grammar/';
