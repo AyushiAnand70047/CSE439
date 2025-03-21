@@ -1,29 +1,60 @@
+/* Neon Animated Background */
 body {
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f9f5f9, #d3d3d3, #a9a8a8);
+    background: linear-gradient(135deg, #141414, #1f1f1f, #141414);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     padding: 20px;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ecf0f1;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
+/* Soft Neon Glow */
+body::before {
+    content: '';
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, rgba(0, 255, 242, 0.3) 10%, rgba(0, 0, 0, 0.1) 80%);
+    top: 0;
+    left: 0;
+    z-index: -1;
+    opacity: 0.5;
+    animation: pulseGlow 6s infinite alternate;
+}
+
+/* Background Animation */
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
+/* Glow Animation */
+@keyframes pulseGlow {
+    0% { opacity: 0.2; }
+    100% { opacity: 0.5; }
+}
+
+/* Grid Container */
 .parent {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
     max-width: 1200px;
-    margin: 0 auto;
-    height: 100%;
+    margin: 20px auto;
+    padding: 20px;
     position: relative;
 }
 
+/* Glass Effect */
 .parent::before {
     content: '';
     position: absolute;
@@ -31,18 +62,19 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     border-radius: 25px;
     z-index: -1;
 }
 
+/* Card Styling */
 .child {
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 55px;
-    color: black;
+    color: white;
     cursor: pointer;
     border-radius: 20px;
     padding: 40px;
@@ -52,31 +84,54 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-.child::before {
+/* Hover Effect */
+.child:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 255, 242, 0.3);
+}
+
+/* Neon Border */
+.child::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(-100%);
-    transition: transform 0.5s ease;
+    inset: 0;
+    border-radius: 20px;
+    padding: 2px;
+    background: linear-gradient(135deg, #00ffff, #ff00ff);
+    z-index: -1;
+    opacity: 0.3;
+    transition: opacity 0.3s ease-in-out;
 }
 
-.child:hover {
-    transform: translateZ(-10px) scale(1.04);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+/* Neon Effect on Hover */
+.child:hover::after {
+    opacity: 0.6;
 }
 
-/* Stunning gradients for each card */
+/* Stunning Gradients for Each Card */
 .child:nth-child(1),
 .child:nth-child(2),
 .child:nth-child(3),
 .child:nth-child(4) {
-    background: linear-gradient(45deg, #ddd7f4, #eabaf8, #ea98f7);
-    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.25);
+    background: linear-gradient(45deg, #272c34, #353a42, #272c34);
+    box-shadow: 0 10px 30px rgba(0, 255, 242, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .parent {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 10px;
+    }
+    .child {
+        font-size: 45px;
+        height: 180px;
+    }
 }
