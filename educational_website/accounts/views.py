@@ -1,5 +1,8 @@
 import face_recognition
+import os
+import traceback
 import base64
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
@@ -59,17 +62,27 @@ def register_page(request):
 def login_user(request):
     if request.method == 'POST':
         try:
-            username = request.POST.get('username')
+            # Get face image data
             face_image_data = request.POST.get('face_image')
+            
+            # If no face_image in POST, check if it's in raw body
+            if not face_image_data:
+                import json
+                try:
+                    body = request.body.decode('utf-8')
+                    body_data = json.loads(body)
+                    face_image_data = body_data.get('face_image')
+                except Exception as body_error:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'No image data received.',
+                    })
 
-            # Get the user
-            try:
-                user = User.objects.get(username=username)
-                user_image = UserImages.objects.get(user=user)
-            except (User.DoesNotExist, UserImages.DoesNotExist):
+            # Validate face image data
+            if not face_image_data:
                 return JsonResponse({
                     'status': 'error',
-                    'message': 'User not found.'
+                    'message': 'No face image data received.'
                 })
 
             # Process the base64 image
@@ -79,68 +92,72 @@ def login_user(request):
             # Create temporary file for uploaded image
             uploaded_image = ContentFile(
                 base64.b64decode(face_image_data),
-                name=f'temp_{username}_face.jpg'
+                name='temp_face.jpg'
             )
 
-            # Load and encode faces
-            try:
-                uploaded_face = face_recognition.load_image_file(uploaded_image)
-                uploaded_encodings = face_recognition.face_encodings(uploaded_face)
+            # Load and encode uploaded face
+            uploaded_face = face_recognition.load_image_file(uploaded_image)
+            uploaded_encodings = face_recognition.face_encodings(uploaded_face)
 
-                if not uploaded_encodings:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'No face detected in the uploaded image.'
-                    })
-
-                stored_face = face_recognition.load_image_file(user_image.face_image.path)
-                stored_encodings = face_recognition.face_encodings(stored_face)
-
-                if not stored_encodings:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Error with stored face image.'
-                    })
-
-                # Compare faces
-                match = face_recognition.compare_faces(
-                    [stored_encodings[0]], 
-                    uploaded_encodings[0],
-                    tolerance=0.6
-                )
-
-                if match[0]:
-                    login(request, user)
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': 'Login successful! Redirecting...'
-                    })
-                else:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Face verification failed.'
-                    })
-
-            except Exception as e:
-                print(f"Face recognition error: {str(e)}")
+            if not uploaded_encodings:
                 return JsonResponse({
                     'status': 'error',
-                    'message': 'Error during face verification.'
+                    'message': 'No face detected in the uploaded image.'
                 })
 
+            # Get all UserImages
+            user_images = UserImages.objects.all()
+
+            # Check against stored images in media folder
+            for user_image in user_images:
+                try:
+                    # Verify image file exists
+                    if not os.path.exists(user_image.face_image.path):
+                        print(f"Image not found: {user_image.face_image.path}")
+                        continue
+
+                    # Load stored face
+                    stored_face = face_recognition.load_image_file(user_image.face_image.path)
+                    stored_encodings = face_recognition.face_encodings(stored_face)
+
+                    if not stored_encodings:
+                        continue  # Skip if no face detected in this image
+
+                    # Compare faces with stricter tolerance
+                    match = face_recognition.compare_faces(
+                        [stored_encodings[0]], 
+                        uploaded_encodings[0],
+                        tolerance=0.45  # Lowered tolerance for more strict matching
+                    )
+
+                    if match[0]:
+                        # Find the user associated with this image
+                        user = user_image.user
+                        login(request, user)
+                        return JsonResponse({
+                            'status': 'success',
+                            'message': 'Login successful! Redirecting...'
+                        })
+
+                except Exception as image_error:
+                    print(f"Error processing image: {image_error}")
+                    continue
+
+            # If no match found after checking all images
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Face not recognized. Access denied.'
+            })
+
         except Exception as e:
-            print(f"Login error: {str(e)}")
+            print(f"Login error: {e}")
+            print(traceback.format_exc())
             return JsonResponse({
                 'status': 'error',
                 'message': 'An error occurred during login.'
             })
 
     return render(request, 'login.html')
-
-# def home(request):
-#     if not request.user.is_authenticated:
-#         return redirect('login_user')
-#     return render(request, 'home.html')
 
 def home(request):
     if not request.user.is_authenticated:

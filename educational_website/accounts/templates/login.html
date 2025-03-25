@@ -11,99 +11,19 @@
 {% block content %}
 <body onclick="speak('Login Page')">
     <div class="login-container" onclick="event.stopPropagation()">
-        <h2>Login with Face Recognition</h2>
-        <form id="login-form">
-            <input type="text" id="username" name="username" placeholder="Username" required>
-            
-            <div id="camera-container">
-                <video id="video" width="100%" height="auto" autoplay></video>
-                <button type="button" id="capture-button">Capture Face</button>
-                <canvas id="canvas" width="300" height="200"></canvas>
-            </div>
-    
-            <button type="submit">Login</button>
-        </form>
-        <div id="message"></div>
+        <h2>Face Recognition Login</h2>
+        <div id="camera-container">
+            <video id="video" width="300" height="200" autoplay></video>
+            <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+            <div id="message"></div>
+        </div>
     </div>
 </body>
 {% endblock %}
 
 {% block scripts %}
-<script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureButton = document.getElementById('capture-button');
-    const loginForm = document.getElementById('login-form');
-    const messageDiv = document.getElementById('message');
-
-    let capturedImage = null;
-
-    // Access the camera and start the video stream
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-            video.srcObject = stream;
-        })
-        .catch((err) => {
-            console.log('Error accessing camera: ' + err);
-            messageDiv.innerText = 'Camera not accessible. Please check permissions.';
-        });
-
-    // Capture image from the video stream
-    captureButton.addEventListener('click', () => {
-        if (!video.srcObject) {
-            messageDiv.innerText = "Camera is not available.";
-            return;
-        }
-
-        const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        capturedImage = canvas.toDataURL('image/jpeg');
-
-        messageDiv.innerText = "Face captured successfully! Ready to login.";
-    });
-
-    // Handle form submission
-    loginForm.onsubmit = async (e) => {
-        e.preventDefault();
-
-        if (!capturedImage) {
-            messageDiv.innerText = "Please capture your face first.";
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('username', document.getElementById('username').value);
-        formData.append('face_image', capturedImage);
-
-        try {
-            messageDiv.innerText = "Verifying...";
-            
-            const response = await fetch('/accounts/login/', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-            messageDiv.innerText = data.message;
-
-            if (data.status === 'success') {
-                // Stop the video stream
-                const stream = video.srcObject;
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-                
-                // Add delay before redirect
-                setTimeout(() => {
-                    window.location.href = '/content/home/';
-                }, 2000);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            messageDiv.innerText = 'An error occurred during login.';
-        }
-    };
-</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="{% static 'login.js' %}"></script>
 <script src="{% static 'voice-navigation.js' %}"></script>
 <script src="{% static 'voice-feedback.js' %}"></script>
 {% endblock %}
