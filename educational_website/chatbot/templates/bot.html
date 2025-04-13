@@ -1,0 +1,147 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat With My AI Buddie</title>
+    <link rel="stylesheet" href="{% static 'bot.css' %}" />
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span>Chat With My AI Buddie 🤖</span>
+        </div>
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                </path>
+            </svg>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 class="main-title">Chat With My AI Buddie</h1>
+        <p class="subtitle">Select who you'd like to chat with today</p>
+
+        <div class="assistant-cards">
+            <div class="assistant-card" id="teacher-tia">
+                <div class="assistant-header">
+                    <div class="assistant-avatar">TT</div>
+                    <h3 class="assistant-name">Teacher Tia</h3>
+                </div>
+                <p class="assistant-title">Your Friendly Learning Guide</p>
+                <p class="assistant-bio">
+                    Hello, I'm Teacher Tia! I help kids learn how to speak clearly, build new words, and ask smart questions. 
+                    Let's explore ABCs, basic sentences, and magical stories that make learning super fun!
+                </p>
+                <div class="tags">
+                    <span class="tag">Learn English</span>
+                    <span class="tag">Story Time</span>
+                    <span class="tag">Speaking Practice</span>
+                    <span class="tag">ABC Games</span>
+                    <span class="tag">Questions & Answers</span>
+                </div>
+            </div>
+
+            <div class="assistant-card" id="buddy-bubbles">
+                <div class="assistant-header">
+                    <div class="assistant-avatar">BB</div>
+                    <h3 class="assistant-name">Buddy Bubbles</h3>
+                </div>
+                <p class="assistant-title">Fun, Games & Giggles Assistant</p>
+                <p class="assistant-bio">
+                    Hiya! I’m Buddy Bubbles — your giggle buddy! I love playing games, singing songs, telling funny jokes, and 
+                    making you smile. Let’s have fun and laugh while learning new things along the way!
+                </p>
+                <div class="tags">
+                    <span class="tag">Jokes & Riddles</span>
+                    <span class="tag">Songs & Rhymes</span>
+                    <span class="tag">Cartoon Fun</span>
+                    <span class="tag">Animal Sounds</span>
+                    <span class="tag">Guessing Games</span>
+                </div>
+            </div>
+        </div>
+
+        <form id="hidden-form" method="post" style="display: none;">
+            {% csrf_token %}
+            <input type="text" name="question" id="hidden-question-input">
+        </form>
+
+        {% if response %}
+        <h2>Response:</h2>
+        <p id="response-text">{{ response }}</p>
+        {% endif %}
+
+    </div>
+
+    <script>
+        function speakResponse(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            // Optional: Choose a better voice
+            const voices = window.speechSynthesis.getVoices();
+            const friendlyVoice = voices.find(voice => voice.name.includes("Google") || voice.name.includes("UK"));
+            if (friendlyVoice) utterance.voice = friendlyVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        let silenceTimeout;
+
+        const handleAssistantClick = (assistantId) => {
+            console.log(`🎤 Listening started for: ${assistantId}`);
+            recognition.start();
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                console.log("You said:", transcript);
+                document.getElementById('hidden-question-input').value = transcript;
+                document.getElementById('hidden-form').submit();
+            };
+
+            recognition.onspeechend = function () {
+                silenceTimeout = setTimeout(() => {
+                    recognition.stop();
+                    console.log("🛑 Silence detected, stopped listening.");
+                }, 2000);
+            };
+
+            recognition.onerror = function (event) {
+                console.error("Speech recognition error:", event.error);
+            };
+        };
+
+        document.getElementById('teacher-tia').addEventListener('click', () => {
+            handleAssistantClick("teacher-tia");
+        });
+
+        document.getElementById('buddy-bubbles').addEventListener('click', () => {
+            handleAssistantClick("buddy-bubbles");
+        });
+
+        // Speak response if exists
+        const responseText = "{{ response|escapejs|default:'' }}";
+        if (responseText) {
+            speakResponse(responseText);
+        }
+    </script>
+</body>
+
+</html>

@@ -24,4 +24,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('content/',include('content.urls')),
     path('voice-grammar/', include('voice_grammar.urls', namespace='voice_grammar')),
+    path('chatbot/',include('chatbot.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

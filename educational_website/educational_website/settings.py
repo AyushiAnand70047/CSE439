@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'accounts',
     'content',
     'voice_grammar',
+    'chatbot'
 ]
 
 MIDDLEWARE = [
