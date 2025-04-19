@@ -1,137 +1,194 @@
-/* Neon Animated Background */
 body {
     margin: 0;
+    padding: 0;
+    background-color: #0a0a1a;
+    font-family: 'Arial', sans-serif;
+    color: #fff;
     min-height: 100vh;
-    background: linear-gradient(135deg, #141414, #1f1f1f, #141414);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    padding: 20px;
-    font-family: 'Poppins', sans-serif;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    color: #ecf0f1;
-    position: relative;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
-/* Soft Neon Glow */
-body::before {
-    content: '';
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    background: radial-gradient(circle, rgba(0, 255, 242, 0.3) 10%, rgba(0, 0, 0, 0.1) 80%);
-    top: 0;
-    left: 0;
-    z-index: -1;
-    opacity: 0.5;
-    animation: pulseGlow 6s infinite alternate;
-}
-
-/* Background Animation */
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Glow Animation */
-@keyframes pulseGlow {
-    0% { opacity: 0.2; }
-    100% { opacity: 0.5; }
-}
-
-/* Grid Container */
-.parent {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    position: relative;
-}
-
-/* Glass Effect */
-.parent::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    backdrop-filter: blur(12px);
-    border-radius: 25px;
-    z-index: -1;
-}
-
-/* Card Styling */
-.child {
-    margin: 0;
-    display: flex;
     justify-content: center;
-    align-items: center;
-    font-size: 55px;
-    color: white;
-    cursor: pointer;
-    border-radius: 20px;
-    padding: 40px;
-    height: 220px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 700;
-    text-align: center;
-    position: relative;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Hover Effect */
-.child:hover {
-    transform: scale(1.05);
-    box-shadow: 0 20px 40px rgba(0, 255, 242, 0.3);
+header {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
-/* Neon Border */
-.child::after {
-    content: '';
-    position: absolute;
-    inset: 0;
+h1 {
+    font-size: 2.5rem;
+    text-shadow: 0 0 10px rgba(0, 162, 255, 0.8);
+    margin: 0;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 1400px;
+    height: 500px;
+    background-color: rgba(8, 15, 40, 0.6);
     border-radius: 20px;
-    padding: 2px;
-    background: linear-gradient(135deg, #00ffff, #ff00ff);
-    z-index: -1;
-    opacity: 0.3;
-    transition: opacity 0.3s ease-in-out;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 162, 255, 0.4), 
+                inset 0 0 30px rgba(0, 162, 255, 0.2);
+    border: 1px solid rgba(0, 162, 255, 0.4);
+    position: relative;
 }
 
-/* Neon Effect on Hover */
-.child:hover::after {
-    opacity: 0.6;
+.parent {
+    position: relative;
+    height: 100%;
+    width: 100%;
 }
 
-/* Stunning Gradients for Each Card */
-.child:nth-child(1),
-.child:nth-child(2),
-.child:nth-child(3),
-.child:nth-child(4) {
-    background: linear-gradient(45deg, #272c34, #353a42, #272c34);
-    box-shadow: 0 10px 30px rgba(0, 255, 242, 0.2);
+.child {
+    position: absolute;
+    width: 300px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .parent {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        padding: 10px;
-    }
-    .child {
-        font-size: 45px;
-        height: 180px;
-    }
+.circle {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    transition: all 0.3s ease;
+    background-color: rgba(15, 25, 60, 0.8);
+    box-shadow: 0 0 15px rgba(0, 162, 255, 0.5);
+    border: 1px solid rgba(0, 162, 255, 0.4);
+}
+
+.child:hover .circle {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 162, 255, 0.8);
+    background-color: rgba(20, 40, 100, 0.9);
+}
+
+.child:active .circle {
+    transform: scale(0.98);
+}
+
+/* Positioning based on the image layout */
+.alphabet {
+    top: 20px;
+    left: 2%;
+}
+
+.numbers {
+    bottom: 20px;
+    left: 25%;
+}
+
+.table {
+    top: 20px;
+    left: 50%;
+}
+
+.practice {
+    bottom: 20px;
+    left: 75%;
+}
+
+/* Individual colors for each circle */
+.alphabet .circle {
+    border-color: #ff3b3b;
+    box-shadow: 0 0 15px rgba(255, 59, 59, 0.5);
+}
+
+.numbers .circle {
+    border-color: #00b9d6;
+    box-shadow: 0 0 15px rgba(0, 185, 214, 0.5);
+}
+
+.table .circle {
+    border-color: #ffc107;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+}
+
+.practice .circle {
+    border-color: #0d4c92;
+    box-shadow: 0 0 15px rgba(13, 76, 146, 0.5);
+}
+
+.icon {
+    width: 100px;
+    height: 100px;
+    fill: white;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0, 162, 255, 0.8);
+}
+
+.description {
+    text-align: center;
+    color: #ccc;
+    font-size: 0.95rem;
+    max-width: 200px;
+}
+
+/* Connecting lines (styled like in your login page) */
+.horizontal-line {
+    position: absolute;
+    height: 3px;
+    background: linear-gradient(to right, rgba(0, 162, 255, 0.2), rgba(0, 162, 255, 0.8), rgba(0, 162, 255, 0.2));
+    top: 50%;
+    width: 80%;
+    left: 10%;
+}
+
+.vertical-line {
+    position: absolute;
+    width: 3px;
+    background: linear-gradient(to bottom, rgba(0, 162, 255, 0.2), rgba(0, 162, 255, 0.8), rgba(0, 162, 255, 0.2));
+    height: 80%;
+    left: 50%;
+    top: 10%;
+}
+
+.glow-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: #00a2ff;
+    opacity: 0.8;
+}
+
+.top-left {
+    top: 20px;
+    left: 20px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+}
+
+.top-right {
+    top: 20px;
+    right: 20px;
+    border-top: 2px solid;
+    border-right: 2px solid;
+}
+
+.bottom-left {
+    bottom: 20px;
+    left: 20px;
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+}
+
+.bottom-right {
+    bottom: 20px;
+    right: 20px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
 }
