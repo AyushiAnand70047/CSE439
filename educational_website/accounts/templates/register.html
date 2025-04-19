@@ -14,17 +14,12 @@
     <div class="register-container" onclick="event.stopPropagation()">
         <h2>Register with Face Recognition</h2>
         <form id="register-form">
-            <!-- <input type="text" id="username" name="username" placeholder="Username" required> -->
-
             <div id="camera-container">
                 <video id="video" width="100%" height="auto" autoplay></video>
-                <button type="button" id="capture-button">Capture Face</button>
-                <canvas id="canvas" width="300" height="200"></canvas>
+                <canvas id="canvas" width="300" height="300"></canvas>
             </div>
-
-            <button type="submit">Register</button>
         </form>
-        <div id="message"></div>
+        <div id="message">Please position your face in the frame</div>
     </div>
 </body>
 {% endblock %}
@@ -32,88 +27,149 @@
 {% block scripts %}
 <script>
     const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureButton = document.getElementById('capture-button');
-    const registerForm = document.getElementById('register-form');
-    const messageDiv = document.getElementById('message');
+        const canvas = document.getElementById('canvas');
+        const cameraContainer = document.getElementById('camera-container');
+        const registerForm = document.getElementById('register-form');
+        const messageDiv = document.getElementById('message');
 
-    let capturedImage = null;
+        let capturedImage = null;
+        let clickTimer = null;
+        let isCapturing = false;
 
-    // Access the camera and start the video stream
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-            video.srcObject = stream;
-        })
-        .catch((err) => {
-            console.log('Error accessing camera: ' + err);
-            messageDiv.innerText = 'Camera not accessible. Please check permissions.';
-        });
-
-    // Capture image from the video stream
-    captureButton.addEventListener('click', () => {
-        if (!video.srcObject) {
-            messageDiv.innerText = "Please enable the camera.";
-            return;
-        }
-        const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        capturedImage = canvas.toDataURL('image/jpeg');
-        messageDiv.innerText = "Face captured successfully!";
-    });
-
-    // Handle form submission
-    registerForm.onsubmit = async (e) => {
-        e.preventDefault();
-
-        if (!capturedImage) {
-            messageDiv.innerText = "Please capture your face first.";
-            return;
-        }
-
-        function generateRandomText(length = 8) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        const randomText = generateRandomText();
-
-        const formData = new FormData();
-        //formData.append('username', document.getElementById('username').value);
-        formData.append('username', randomText);
-        formData.append('face_image', capturedImage);
-
-        try {
-            messageDiv.innerText = "Processing registration...";
-
-            const response = await fetch('/accounts/register/', {
-                method: 'POST',
-                body: formData
+        // Access the camera and start the video stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.log('Error accessing camera: ' + err);
+                messageDiv.innerText = 'Camera not accessible. Please check permissions.';
+                messageDiv.classList.add('error');
             });
 
-            const data = await response.json();
-            messageDiv.innerText = data.message;
-
-            if (data.status === 'success') {
-                // Stop the video stream
-                const stream = video.srcObject;
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-
-                // Add delay before redirect
-                setTimeout(() => {
-                    window.location.href = '/accounts/login/';
-                }, 2000);
+        // Capture image from the video stream
+        function captureImage() {
+            if (!video.srcObject) {
+                messageDiv.innerText = "Please enable the camera.";
+                messageDiv.classList.add('error');
+                return;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            messageDiv.innerText = 'An error occurred during registration.';
+            
+            // Update canvas size to match video dimensions for better quality
+            const videoWidth = video.videoWidth;
+            const videoHeight = video.videoHeight;
+            canvas.width = videoWidth;
+            canvas.height = videoHeight;
+            
+            cameraContainer.classList.add('scanning');
+            messageDiv.innerText = "Capturing your face...";
+            messageDiv.classList.add('processing');
+            
+            // Add delay for visual effect
+            setTimeout(() => {
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                capturedImage = canvas.toDataURL('image/jpeg');
+                
+                cameraContainer.classList.remove('scanning');
+                messageDiv.innerText = "Face captured successfully! Double-click to register.";
+                messageDiv.classList.remove('processing');
+                messageDiv.classList.add('success');
+            }, 1000);
         }
-    };
+
+        // Handle form submission
+        async function submitRegistration() {
+            if (!capturedImage) {
+                messageDiv.innerText = "Please capture your face first (single click).";
+                messageDiv.classList.add('error');
+                return;
+            }
+
+            function generateRandomText(length = 8) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            const randomText = generateRandomText();
+
+            const formData = new FormData();
+            formData.append('username', randomText);
+            formData.append('face_image', capturedImage);
+
+            try {
+                messageDiv.innerText = "Processing registration...";
+                messageDiv.classList.remove('success', 'error');
+                messageDiv.classList.add('processing');
+                cameraContainer.classList.add('scanning');
+
+                const response = await fetch('/accounts/register/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    messageDiv.innerText = data.message + " Redirecting to login...";
+                    messageDiv.classList.remove('processing');
+                    messageDiv.classList.add('success');
+                    
+                    // Stop the video stream
+                    const stream = video.srcObject;
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+
+                    // Add delay before redirect
+                    setTimeout(() => {
+                        window.location.href = '/accounts/login/';
+                    }, 2000);
+                } else {
+                    messageDiv.innerText = data.message || "Registration failed. Please try again.";
+                    messageDiv.classList.remove('processing');
+                    messageDiv.classList.add('error');
+                    cameraContainer.classList.remove('scanning');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.innerText = 'An error occurred during registration.';
+                messageDiv.classList.remove('processing');
+                messageDiv.classList.add('error');
+                cameraContainer.classList.remove('scanning');
+            }
+        }
+
+        // Set up click handling for the camera container
+        cameraContainer.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (clickTimer === null) {
+                clickTimer = setTimeout(function() {
+                    clickTimer = null;
+                    // Single click action
+                    captureImage();
+                }, 300);
+            }
+        });
+
+        // Handle double click
+        cameraContainer.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            // Double click action
+            submitRegistration();
+        });
+
+        // Handle form submission (prevent default)
+        registerForm.onsubmit = (e) => {
+            e.preventDefault();
+        };
 </script>
 <script src="{% static 'voice-navigation.js' %}"></script>
 <script src="{% static 'voice-feedback.js' %}"></script>
