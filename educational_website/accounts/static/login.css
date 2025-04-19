@@ -1,227 +1,235 @@
-/* login.css */
-body {
+* {
     margin: 0;
     padding: 0;
-    background-color: #111111;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    font-family: 'Arial', sans-serif;
+    min-height: 100vh;
+    background-color: #0a0a1a;
     color: #fff;
-    overflow: hidden;
 }
 
 .login-container {
-    position: relative;
-    width: 700px;
-    height: 700px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 90%;
+    max-width: 800px;
+    background-color: rgba(15, 15, 30, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 30px rgba(0, 70, 255, 0.3);
+    border: 1px solid rgba(0, 119, 255, 0.3);
 }
 
 h2 {
-    color: #fff;
-    margin-bottom: 10px;
     text-align: center;
+    margin-bottom: 25px;
+    color: #fff;
+    font-size: 28px;
+    text-shadow: 0 0 10px rgba(0, 110, 255, 0.7);
 }
 
 #camera-container {
     position: relative;
-    width: 500px;
+    margin-bottom: 25px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 68, 255, 0.5);
+    cursor: pointer;
+    border: 2px solid #0066ff;
     height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-/* Main circle */
-.scan-circle {
+#camera-container:before {
+    content: "";
     position: absolute;
-    width: 420px;
-    height: 420px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.8);
-    box-shadow: 0 0 30px rgba(0, 100, 255, 0.3);
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 60, 255, 0.2), transparent);
+    pointer-events: none;
+    z-index: 2;
 }
 
-/* Rotating blue line - Adjusted to match scan-circle size exactly */
+#video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background-color: #000;
+}
+
+#canvas {
+    display: none;
+}
+
+/* Scanning elements */
+.scan-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+}
+
 .scan-line {
     position: absolute;
-    width: 420px; /* Adjusted to match scan-circle */
-    height: 420px; /* Adjusted to match scan-circle */
-    border-radius: 50%;
-    border: 1px solid transparent;
-    border-left: 2px solid #0066ff;
-    z-index: 2;
-    animation: rotate 4s linear infinite;
-    box-shadow: 0 0 10px #0066ff;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to right, transparent, #00a2ff, transparent);
+    animation: scanVertical 2s linear infinite;
+    z-index: 4;
+    box-shadow: 0 0 10px rgba(0, 162, 255, 0.8);
 }
 
-/* Digital pattern overlay */
-.pattern-overlay {
+.scan-corners {
     position: absolute;
-    width: 520px;
-    height: 520px;
-    border-radius: 50%;
-    z-index: 0;
-    overflow: visible; /* Allow dots to move outside the container */
-    animation: breathe 6s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
 }
 
-/* Text in the middle */
-.scan-text {
-    color: #fff;
-    font-size: 24px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    z-index: 3;
-}
-
-/* Corner brackets for the scanning area */
 .scan-corner {
     position: absolute;
     width: 40px;
     height: 40px;
     border-color: #3498ff;
-    z-index: 4;
 }
 
 .top-left {
-    top: 150px;
-    left: 100px;
+    top: 20px;
+    left: 20px;
     border-top: 3px solid;
     border-left: 3px solid;
 }
 
 .top-right {
-    top: 150px;
-    right: 100px;
+    top: 20px;
+    right: 20px;
     border-top: 3px solid;
     border-right: 3px solid;
 }
 
 .bottom-left {
-    bottom: 150px;
-    left: 100px;
+    bottom: 20px;
+    left: 20px;
     border-bottom: 3px solid;
     border-left: 3px solid;
 }
 
 .bottom-right {
-    bottom: 150px;
-    right: 100px;
+    bottom: 20px;
+    right: 20px;
     border-bottom: 3px solid;
     border-right: 3px solid;
 }
 
-/* Message display area */
-#message {
+.scan-status {
     position: absolute;
-    bottom: 30px;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 30, 0.7);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 16px;
     color: #0099ff;
-    font-size: 18px;
+    z-index: 5;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px #0066ff;
+}
+
+.scan-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 36px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px #0066ff;
+    z-index: 4;
+    animation: pulseText 2s infinite;
+}
+
+#message {
     text-align: center;
-    width: 100%;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-#video {
-    position: absolute;
-    width: 390px;
-    height: 390px;
-    object-fit: cover;
-    border-radius: 50%;
-    opacity: 0.9;
-    z-index: 1;
-}
-
-#canvas {
-    position: absolute;
-    z-index: 2;
-    display: none;
+    margin-top: 20px;
+    min-height: 24px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: rgba(0, 40, 80, 0.6);
+    transition: all 0.3s ease;
 }
 
 /* Animations */
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+@keyframes scanVertical {
+    0% { top: 0; }
+    100% { top: 100%; }
 }
 
-@keyframes pulse {
-    0% {
-        opacity: 0.3;
-        transform: scale(0.98);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0.3;
-        transform: scale(0.98);
-    }
+@keyframes pulseText {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
-@keyframes dotPulse {
-    0%, 100% {
-        opacity: 0.3;
-    }
-    50% {
-        opacity: 0.8;
-    }
+.scanner-active .scan-text {
+    animation: blinkText 0.5s infinite;
 }
 
-@keyframes breathe {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-/* Individual dot movement */
-.dot {
-    position: absolute;
-    border-radius: 50%;
-    background-color: #0066ff;
-    transform-origin: center;
-}
-
-.dot.breathing {
-    animation: dotBreathe 4s ease-in-out infinite;
-}
-
-@keyframes dotBreathe {
-    0%, 100% {
-        transform: translate(0, 0);
-    }
-    50% {
-        transform: translate(
-            calc(var(--translate-x) * 15px),
-            calc(var(--translate-y) * 15px)
-        );
-    }
+@keyframes blinkText {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 /* Success and error message styling */
 .success-message {
-    color: #00ff66;
+    color: #00ff8c !important;
+    text-shadow: 0 0 5px rgba(0, 255, 140, 0.7);
 }
 
 .error-message {
-    color: #ff3366;
+    color: #ff4d4d !important;
+    text-shadow: 0 0 5px rgba(255, 77, 77, 0.7);
+}
+
+.processing-message {
+    color: #00a2ff !important;
+    text-shadow: 0 0 5px rgba(0, 162, 255, 0.7);
+}
+
+/* Progress indicator */
+.scan-progress {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #0099ff;
+    box-shadow: 0 0 10px #0066ff;
+    transition: width 4s linear;
 }
