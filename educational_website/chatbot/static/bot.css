@@ -1,10 +1,17 @@
 :root {
-    --primary-color: #e78c3c;
-    --dark-bg: #111111;
-    --card-bg: #1a1a1a;
-    --text-primary: #ffffff;
-    --text-secondary: #aaaaaa;
-    --button-bg: #e78c3c;
+    --primary-color: #ffffff; /* White text color */
+    --accent-color-red: #ff3b4e; /* Red glow accent */
+    --accent-color-blue: #00c2ff; /* Blue glow accent */
+    --accent-color-yellow: #ffcc00; /* Yellow glow accent */
+    --dark-bg: #0a0c1a; /* Very dark blue background */
+    --card-bg: #111530; /* Slightly lighter blue for cards */
+    --text-primary: #ffffff; /* White text */
+    --text-secondary: #aaaaaa; /* Light gray text */
+    --border-color: #1e2642; /* Border color for cards */
+    --card-shadow: 0 0 20px rgba(0, 194, 255, 0.2); /* Blue glow shadow */
+    --red-glow: 0 0 20px rgba(255, 59, 78, 0.4); /* Red glow for elements */
+    --blue-glow: 0 0 20px rgba(0, 194, 255, 0.4); /* Blue glow for elements */
+    --yellow-glow: 0 0 20px rgba(255, 204, 0, 0.4); /* Yellow glow for elements */
 }
 
 body {
@@ -21,8 +28,8 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: var(--dark-bg);
-    border-bottom: 1px solid #333;
+    background-color: rgba(10, 12, 26, 0.95);
+    border-bottom: 1px solid #1e2642;
 }
 
 .navbar-brand {
@@ -35,7 +42,7 @@ body {
 }
 
 .main-content {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
@@ -45,80 +52,12 @@ body {
     color: var(--primary-color);
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 .subtitle {
     color: var(--text-secondary);
     margin-bottom: 2rem;
-}
-
-.chat-form {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-    margin-bottom: 1rem;
-    text-align: left;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
-}
-
-textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 4px;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    color: var(--text-primary);
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-}
-
-.btn {
-    background-color: var(--button-bg);
-    color: white;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn:hover {
-    background-color: #d47928;
-}
-
-.response-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    text-align: left;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.response-title {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #333;
-    padding-bottom: 0.5rem;
-}
-
-.response-content {
-    color: var(--text-primary);
-    line-height: 1.6;
 }
 
 .assistant-cards {
@@ -131,11 +70,58 @@ textarea {
 
 .assistant-card {
     background-color: var(--card-bg);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1.5rem;
-    width: 500px;
+    width: 480px;
     text-align: left;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.assistant-card#teacher-tia {
+    box-shadow: var(--red-glow);
+}
+
+.assistant-card#teacher-tia:hover {
+    box-shadow: 0 0 30px rgba(255, 59, 78, 0.6);
+}
+
+.assistant-card#teacher-tia::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 59, 78, 0.5);
+    pointer-events: none;
+}
+
+.assistant-card#buddy-bubbles {
+    box-shadow: var(--yellow-glow);
+}
+
+.assistant-card#buddy-bubbles:hover {
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
+}
+
+.assistant-card#buddy-bubbles::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 204, 0, 0.5);
+    pointer-events: none;
+}
+
+.assistant-card:hover {
+    transform: translateY(-5px);
 }
 
 .assistant-header {
@@ -149,7 +135,7 @@ textarea {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background-color: #2a2a2a;
+    background-color: #1e2642;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -157,14 +143,26 @@ textarea {
     color: var(--primary-color);
 }
 
+#teacher-tia .assistant-avatar {
+    box-shadow: 0 0 10px rgba(255, 59, 78, 0.8);
+    border: 1px solid rgba(255, 59, 78, 0.5);
+}
+
+#buddy-bubbles .assistant-avatar {
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+    border: 1px solid rgba(255, 204, 0, 0.5);
+}
+
 .assistant-name {
     font-size: 1.25rem;
     font-weight: bold;
+    color: var(--text-primary);
 }
 
 .assistant-title {
-    color: var(--text-secondary);
+    color: var(--primary-color);
     margin-bottom: 0.5rem;
+    font-weight: 600;
 }
 
 .assistant-bio {
@@ -181,40 +179,78 @@ textarea {
 }
 
 .tag {
-    background-color: #2a2a2a;
+    background-color: rgba(30, 38, 66, 0.8);
     color: var(--text-secondary);
     padding: 0.25rem 0.75rem;
     border-radius: 16px;
     font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.action-button {
-    background-color: var(--button-bg);
-    color: white;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 1rem;
-    display: inline-block;
+#teacher-tia .tag {
+    box-shadow: 0 0 5px rgba(255, 59, 78, 0.2);
 }
 
-.action-button:hover {
-    background-color: #d47928;
+#buddy-bubbles .tag {
+    box-shadow: 0 0 5px rgba(255, 204, 0, 0.2);
 }
 
-.footer-text {
-    color: var(--text-secondary);
-    margin: 1.5rem 0;
+.response-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    text-align: left;
+    box-shadow: var(--blue-glow);
+    border: 1px solid var(--border-color);
 }
 
-.link {
+.response-title {
     color: var(--primary-color);
-    text-decoration: none;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #1e2642;
+    padding-bottom: 0.5rem;
 }
 
-.link:hover {
-    text-decoration: underline;
+.response-content {
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Added for the frame effect from the educational platform */
+.main-content {
+    position: relative;
+}
+
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Custom corner accents like in the educational platform */
+.assistant-card::after {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: transparent;
+}
+
+#teacher-tia .assistant-card::after {
+    border-top-color: rgba(255, 59, 78, 0.8);
+    border-left-color: rgba(255, 59, 78, 0.8);
+}
+
+#buddy-bubbles .assistant-card::after {
+    border-top-color: rgba(255, 204, 0, 0.8);
+    border-left-color: rgba(255, 204, 0, 0.8);
 }
