@@ -1,18 +1,21 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
-def test(request):
-    return render(request,'test.html')
-
+@login_required
 def home(request):
     return render(request,'home.html')
 
+@login_required
 def alphabet(request):
     return render(request,'basics/alphabet.html')
 
+@login_required
 def number(request):
     return render(request,'basics/number.html')
 
+@login_required
 def table(request):
     return render(request,'basics/table.html')
 

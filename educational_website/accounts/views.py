@@ -134,6 +134,7 @@ def login_user(request):
                         # Find the user associated with this image
                         user = user_image.user
                         login(request, user)
+                        # request.session.set_expiry(0)
                         return JsonResponse({
                             'status': 'success',
                             'message': 'Login successful! Redirecting...'
