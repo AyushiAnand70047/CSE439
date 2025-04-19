@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f7fa;
+    background-color: #111111;
     margin: 0;
     padding: 0;
 }
@@ -9,14 +9,14 @@ body {
     max-width: 400px;
     margin: 50px auto;
     padding: 30px;
-    background-color: #fff;
+    background-color: black;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
 h2 {
-    color: #333;
+    color: white;
     margin-bottom: 20px;
     font-size: 24px;
 }
@@ -29,6 +29,7 @@ input[type="text"] {
     border-radius: 4px;
     font-size: 16px;
     box-sizing: border-box;
+    background-color: black;
 }
 
 #camera-container {

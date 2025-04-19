@@ -14,7 +14,7 @@
     <div class="register-container" onclick="event.stopPropagation()">
         <h2>Register with Face Recognition</h2>
         <form id="register-form">
-            <input type="text" id="username" name="username" placeholder="Username" required>
+            <!-- <input type="text" id="username" name="username" placeholder="Username" required> -->
 
             <div id="camera-container">
                 <video id="video" width="100%" height="auto" autoplay></video>
@@ -70,8 +70,20 @@
             return;
         }
 
+        function generateRandomText(length = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        const randomText = generateRandomText();
+
         const formData = new FormData();
-        formData.append('username', document.getElementById('username').value);
+        //formData.append('username', document.getElementById('username').value);
+        formData.append('username', randomText);
         formData.append('face_image', capturedImage);
 
         try {
