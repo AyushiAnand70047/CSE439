@@ -1,28 +1,227 @@
-#camera-container {
+/* login.css */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #111111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+    overflow: hidden;
+}
+
+.login-container {
+    position: relative;
+    width: 700px;
+    height: 700px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
+    justify-content: center;
 }
-#video, #canvas {
-    max-width: 100%;
-    width: 300px;
-    height: auto;
-}
-#message {
-    margin-top: 10px;
+
+h2 {
+    color: #fff;
+    margin-bottom: 10px;
     text-align: center;
+}
+
+#camera-container {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Main circle */
+.scan-circle {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 30px rgba(0, 100, 255, 0.3);
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Rotating blue line - Adjusted to match scan-circle size exactly */
+.scan-line {
+    position: absolute;
+    width: 420px; /* Adjusted to match scan-circle */
+    height: 420px; /* Adjusted to match scan-circle */
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-left: 2px solid #0066ff;
+    z-index: 2;
+    animation: rotate 4s linear infinite;
+    box-shadow: 0 0 10px #0066ff;
+}
+
+/* Digital pattern overlay */
+.pattern-overlay {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    z-index: 0;
+    overflow: visible; /* Allow dots to move outside the container */
+    animation: breathe 6s ease-in-out infinite;
+}
+
+/* Text in the middle */
+.scan-text {
+    color: #fff;
+    font-size: 24px;
     font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    z-index: 3;
 }
-.error-message {
-    color: red;
+
+/* Corner brackets for the scanning area */
+.scan-corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-color: #3498ff;
+    z-index: 4;
 }
-.success-message {
-    color: green;
+
+.top-left {
+    top: 150px;
+    left: 100px;
+    border-top: 3px solid;
+    border-left: 3px solid;
 }
-.login-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
+
+.top-right {
+    top: 150px;
+    right: 100px;
+    border-top: 3px solid;
+    border-right: 3px solid;
+}
+
+.bottom-left {
+    bottom: 150px;
+    left: 100px;
+    border-bottom: 3px solid;
+    border-left: 3px solid;
+}
+
+.bottom-right {
+    bottom: 150px;
+    right: 100px;
+    border-bottom: 3px solid;
+    border-right: 3px solid;
+}
+
+/* Message display area */
+#message {
+    position: absolute;
+    bottom: 30px;
+    color: #0099ff;
+    font-size: 18px;
     text-align: center;
+    width: 100%;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+#video {
+    position: absolute;
+    width: 390px;
+    height: 390px;
+    object-fit: cover;
+    border-radius: 50%;
+    opacity: 0.9;
+    z-index: 1;
+}
+
+#canvas {
+    position: absolute;
+    z-index: 2;
+    display: none;
+}
+
+/* Animations */
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.98);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.3;
+        transform: scale(0.98);
+    }
+}
+
+@keyframes dotPulse {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+@keyframes breathe {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Individual dot movement */
+.dot {
+    position: absolute;
+    border-radius: 50%;
+    background-color: #0066ff;
+    transform-origin: center;
+}
+
+.dot.breathing {
+    animation: dotBreathe 4s ease-in-out infinite;
+}
+
+@keyframes dotBreathe {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(
+            calc(var(--translate-x) * 15px),
+            calc(var(--translate-y) * 15px)
+        );
+    }
+}
+
+/* Success and error message styling */
+.success-message {
+    color: #00ff66;
+}
+
+.error-message {
+    color: #ff3366;
 }

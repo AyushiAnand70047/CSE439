@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Choose Language
+{% endblock %}
+
+{% load static %}
+{% block style%}
+<link rel="stylesheet" href="{% static 'language-option.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<body onclick="speak('Home page, Choose language')">
+    <div class="heading">Select Your Language</div>
+    <div class="sections" onclick="event.stopPropagation()">
+        <a href="hindi/hindi.html" class="half" onmouseover="speak('Hindi')" onclick="speak('Learn Hindi')">
+            <button class="button">हिंदी</button>
+        </a>
+        <a href="english/english.html" class="half" onmouseover="speak('English')" onclick="speak('Learn English')">
+            <button class="button">English</button>
+        </a>
+    </div>
+</body>
+<script src="{% static 'voice-navigation.js' %}"></script>
+<script src="{% static 'voice-feedback.js' %}"></script>
+{% endblock %}

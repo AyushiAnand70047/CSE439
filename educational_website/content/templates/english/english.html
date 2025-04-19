@@ -19,9 +19,12 @@
     <div class="child" onmouseover="speak('Songs')" onclick="redirectToSongs()">
         Songs
     </div>
-    <div class="child" onmouseover="speak('Practice')" onclick="redirectToVoiceGrammar()">
+    <div class="child" onmouseover="speak('Practice')" onclick="redirectToChatbot()">
         Practice<br>(Talk with bot)
     </div>
+    <!-- <div class="child" onmouseover="speak('Practice')" onclick="redirectToVoiceGrammar()">
+        Practice<br>(Talk with bot)
+    </div> -->
 </div>
 
 <script src="{% static 'voice-navigation.js' %}"></script>
@@ -30,13 +33,21 @@
     function redirectToSongs() {
         window.location.href = "songs/";
     }
-    function redirectToVoiceGrammar() {
+    function redirectToChatbot() {
         try {
-            window.location.href = 'http://localhost:8000/voice-grammar/';
+            window.location.href = 'http://localhost:8000/chatbot/talk/';
         } catch(e) {
             console.error('Redirect error:', e);
-            alert('Could not redirect. Please try navigating to http://localhost:8000/voice-grammar/ manually.');
+            alert('Could not redirect. Please try navigating to http://localhost:8000/chatbot/ manually.');
         }
     }
+    //function redirectToVoiceGrammar() {
+    //    try {
+    //        window.location.href = 'http://localhost:8000/voice-grammar/';
+    //    } catch(e) {
+    //        console.error('Redirect error:', e);
+    //        alert('Could not redirect. Please try navigating to http://localhost:8000/voice-grammar/ manually.');
+    //    }
+    //}
 </script>
 {% endblock %}

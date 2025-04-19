@@ -1,28 +1,53 @@
 {% extends "layout.html" %}
 
-{% block title %}
-Choose Language
-{% endblock %}
+{% block title %}English Learning{% endblock %}
 
 {% load static %}
-{% block style%}
-<link rel="stylesheet" href="{% static 'language-option.css' %}">
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'learning-option.css' %}">
 {% endblock %}
 
-
 {% block content %}
-
-<body onclick="speak('Home page, Choose language')">
-    <div class="heading">Select Your Language</div>
-    <div class="sections" onclick="event.stopPropagation()">
-        <a href="hindi/hindi.html" class="half" onmouseover="speak('Hindi')" onclick="speak('Learn Hindi')">
-            <button class="button">हिंदी</button>
-        </a>
-        <a href="english/english.html" class="half" onmouseover="speak('English')" onclick="speak('Learn English')">
-            <button class="button">English</button>
-        </a>
+<div class="parent">
+    <div class="child" onmouseover="speak('Poems')" onclick="redirectToSongs()">
+        Poems
     </div>
-</body>
+    <div class="child" onmouseover="speak('Short Stories')" onclick="redirectToSongs()">
+        Short Stories
+    </div>
+    <div class="child" onmouseover="speak('Songs')" onclick="redirectToSongs()">
+        Songs
+    </div>
+    <div class="child" onmouseover="speak('Practice')" onclick="redirectToChatbot()">
+        Practice<br>(Talk with bot)
+    </div>
+    <!-- <div class="child" onmouseover="speak('Practice')" onclick="redirectToVoiceGrammar()">
+        Practice<br>(Talk with bot)
+    </div> -->
+</div>
+
 <script src="{% static 'voice-navigation.js' %}"></script>
 <script src="{% static 'voice-feedback.js' %}"></script>
+<script>
+    function redirectToSongs() {
+        window.location.href = "songs/";
+    }
+    function redirectToChatbot() {
+        try {
+            window.location.href = 'http://localhost:8000/chatbot/talk/';
+        } catch(e) {
+            console.error('Redirect error:', e);
+            alert('Could not redirect. Please try navigating to http://localhost:8000/chatbot/ manually.');
+        }
+    }
+    //function redirectToVoiceGrammar() {
+    //    try {
+    //        window.location.href = 'http://localhost:8000/voice-grammar/';
+    //    } catch(e) {
+    //        console.error('Redirect error:', e);
+    //        alert('Could not redirect. Please try navigating to http://localhost:8000/voice-grammar/ manually.');
+    //    }
+    //}
+</script>
 {% endblock %}
