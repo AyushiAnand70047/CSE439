@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+
 <body onclick="speak('Login Page')">
     <div class="login-container" onclick="event.stopPropagation()">
         <h2>Login with Face Recognition</h2>
@@ -32,14 +33,222 @@
         </div>
         <div id="message">Please position your face in the frame</div>
     </div>
-    
+
 </body>
 {% endblock %}
 
 {% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const cameraContainer = document.getElementById('camera-container');
+        const messageDiv = document.getElementById('message');
+        const scanStatus = document.querySelector('.scan-status');
+        const scanText = document.querySelector('.scan-text');
+        const progressBar = document.getElementById('progress-bar');
+    
+        let loginAttemptInProgress = false;
+        let captureInterval = null;
+        let loginTimeout = null;
+        let canSpeak = true; // For the speech timeout functionality
+    
+        // Speech function with 5-second timeout
+        function speak(text) {
+            if (canSpeak) {
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = 'en-US';
+                speech.rate = 1;
+    
+                window.speechSynthesis.speak(speech);
+    
+                // Disable speaking for 5 seconds
+                canSpeak = false;
+    
+                // Re-enable speaking after 5 seconds
+                setTimeout(() => {
+                    canSpeak = true;
+                }, 5000);
+            }
+        }
+    
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        // Show message with styling and speech
+        function showMessage(message, type = 'normal') {
+            messageDiv.textContent = message;
+            messageDiv.className = '';
+    
+            if (type === 'error') {
+                messageDiv.classList.add('error-message');
+            } else if (type === 'success') {
+                messageDiv.classList.add('success-message');
+            } else if (type === 'processing') {
+                messageDiv.classList.add('processing-message');
+            } else if (type === 'info') {
+                messageDiv.classList.add('info-message');
+            }
+            
+            // Add speech for important messages
+            if (type === 'error' || type === 'success' || type === 'info') {
+                speak(message);
+            }
+        }
+    
+        // Request camera access
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+    
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        resolve(true);
+                    };
+                });
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                showMessage('Camera access denied. Please check permissions.', 'error');
+                scanStatus.textContent = 'ERROR';
+                scanText.textContent = 'NO CAMERA';
+                return false;
+            }
+        }
+    
+        // Capture face from video stream
+        function captureFrame() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/jpeg');
+        }
+    
+        // Reset login state
+        function resetLoginState() {
+            loginAttemptInProgress = false;
+            clearInterval(captureInterval);
+            clearTimeout(loginTimeout);
+            progressBar.style.width = '0%';
+            scanStatus.textContent = 'SCANNING';
+            scanText.textContent = 'FACE DETECTION';
+            cameraContainer.classList.remove('scanner-active');
+        }
+    
+        // Send captured image to server for face recognition
+        async function sendFaceForRecognition(imageData) {
+            if (loginAttemptInProgress) return;
+    
+            loginAttemptInProgress = true;
+            cameraContainer.classList.add('scanner-active');
+            scanStatus.textContent = 'VERIFYING';
+            scanText.textContent = 'PLEASE WAIT';
+            showMessage('Verifying your identity...', 'processing');
+    
+            // Animate progress bar
+            progressBar.style.width = '100%';
+    
+            try {
+                const response = await fetch('/accounts/login/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'  // Added for proper AJAX identification
+                    },
+                    body: JSON.stringify({ face_image: imageData })
+                });
+    
+                const data = await response.json();
+    
+                if (data.status === 'success') {
+                    scanStatus.textContent = 'ACCESS GRANTED';
+                    scanText.textContent = 'WELCOME';
+                    showMessage('Login successful! Redirecting...', 'success');
+    
+                    // Stop video stream
+                    const stream = video.srcObject;
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+    
+                    // Redirect to home page
+                    setTimeout(() => {
+                        window.location.href = '/content/home/';
+                    }, 2000);
+                } else {
+                    scanStatus.textContent = 'ACCESS DENIED';
+                    scanText.textContent = 'RETRY';
+                    showMessage(data.message || 'Login failed. Retrying...', 'error');
+    
+                    // Reset after delay
+                    setTimeout(() => {
+                        resetLoginState();
+                        startFaceRecognition();
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                scanStatus.textContent = 'CONNECTION ERROR';
+                scanText.textContent = 'RETRY';
+                showMessage('Network error. Please try again.', 'error');
+    
+                // Reset after delay
+                setTimeout(() => {
+                    resetLoginState();
+                    startFaceRecognition();
+                }, 3000);
+            }
+        }
+    
+        // Periodic face capture and recognition
+        async function startFaceRecognition() {
+            const cameraReady = await setupCamera();
+            if (!cameraReady) return;
+    
+            showMessage('Detecting face... Please look at the camera.', 'processing');
+    
+            // Wait 2 seconds before first attempt to ensure camera is initialized
+            setTimeout(() => {
+                // Attempt face recognition every 5 seconds
+                captureInterval = setInterval(() => {
+                    try {
+                        if (!loginAttemptInProgress) {
+                            const imageData = captureFrame();
+                            sendFaceForRecognition(imageData);
+                        }
+                    } catch (error) {
+                        console.error('Error during face capture:', error);
+                    }
+                }, 5000);
+    
+                // Initial capture
+                const imageData = captureFrame();
+                sendFaceForRecognition(imageData);
+            }, 2000);
+        }
+    
+        // Make speech function global for external access
+        window.speak = speak;
+    
+        // Start automatic face recognition when page loads
+        startFaceRecognition();
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="{% static 'login.js' %}"></script>
-<script src="{% static 'voice-navigation.js' %}"></script>
-<script src="{% static 'voice-feedback.js' %}"></script>
 
 {% endblock %}

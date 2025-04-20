@@ -34,7 +34,61 @@ def register_page(request):
             if ',' in face_image_data:
                 face_image_data = face_image_data.split(',')[1]
 
-            # Decode base64 to file
+            # Decode base64 to file for face recognition
+            uploaded_image = ContentFile(
+                base64.b64decode(face_image_data),
+                name='temp_face.jpg'
+            )
+
+            # Load and encode uploaded face
+            uploaded_face = face_recognition.load_image_file(uploaded_image)
+            uploaded_encodings = face_recognition.face_encodings(uploaded_face)
+
+            if not uploaded_encodings:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No face detected in the uploaded image.'
+                })
+
+            # Check if this face already exists in our database
+            user_images = UserImages.objects.all()
+            for user_image in user_images:
+                try:
+                    # Verify image file exists
+                    if not os.path.exists(user_image.face_image.path):
+                        print(f"Image not found: {user_image.face_image.path}")
+                        continue
+
+                    # Load stored face
+                    stored_face = face_recognition.load_image_file(user_image.face_image.path)
+                    stored_encodings = face_recognition.face_encodings(stored_face)
+
+                    if not stored_encodings:
+                        continue  # Skip if no face detected in this image
+
+                    # Compare faces with same tolerance as login
+                    match = face_recognition.compare_faces(
+                        [stored_encodings[0]], 
+                        uploaded_encodings[0],
+                        tolerance=0.45  # Same strict tolerance as login
+                    )
+
+                    if match[0]:
+                        # Face already exists - return JSON with status for AJAX requests
+                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                            return JsonResponse({
+                                'status': 'exists',
+                                'message': 'Face already registered. Redirecting to login page...'
+                            })
+                        # For regular form submissions, redirect directly
+                        else:
+                            return redirect('login_user')
+
+                except Exception as image_error:
+                    print(f"Error processing image: {image_error}")
+                    continue
+
+            # If we reach here, face is new - create a new file for storage
             face_image = ContentFile(
                 base64.b64decode(face_image_data),
                 name=f'{username}_face.jpg'
@@ -44,17 +98,28 @@ def register_page(request):
             user = User.objects.create_user(username=username)
             UserImages.objects.create(user=user, face_image=face_image)
 
-            return JsonResponse({
-                'status': 'success',
-                'message': 'Registration successful! Redirecting to login...'
-            })
+            # Return appropriate response based on request type
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Registration successful! Redirecting to login...'
+                })
+            else:
+                return redirect('login_user')
 
         except Exception as e:
             print(f"Registration error: {str(e)}")
-            return JsonResponse({
-                'status': 'error',
-                'message': 'An error occurred during registration. Please try again.'
-            })
+            print(traceback.format_exc())
+            
+            # Return error response based on request type
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'An error occurred during registration. Please try again.'
+                })
+            else:
+                # For regular form submissions, render the page with an error
+                return render(request, 'register.html', {'error': 'An error occurred during registration.'})
 
     return render(request, 'register.html')
 

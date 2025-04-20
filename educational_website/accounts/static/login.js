@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scanStatus.textContent = 'VERIFYING';
         scanText.textContent = 'PLEASE WAIT';
         showMessage('Verifying your identity...', 'processing');
+        speak('Verifying your identity')
         
         // Animate progress bar
         progressBar.style.width = '100%';
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.status === 'success') {
                 scanStatus.textContent = 'ACCESS GRANTED';
                 scanText.textContent = 'WELCOME';
+                speak('Login Successfull')
                 showMessage('Login successful! Redirecting...', 'success');
                 
                 // Stop video stream
@@ -187,3 +189,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start automatic face recognition when page loads
     startFaceRecognition();
 });
+
+function speak(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';
+    speech.rate = 1;
+    window.speechSynthesis.speak(speech);
+}

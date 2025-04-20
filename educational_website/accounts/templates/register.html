@@ -8,12 +8,26 @@
 <link rel="stylesheet" href="{% static 'register.css' %}">
 {% endblock %}
 
+<style>
+    .disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    #countdown {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+    }
+</style>
+
 {% block content %}
 
-<body onclick="speak('Registration page')">
+<body id="speakButton"
+    onclick="speak('Registration page')">
     <div class="register-container" onclick="event.stopPropagation()">
         <h2>Register with Face Recognition</h2>
-        <form id="register-form">
+        <form id="register-form" onmouseover="speak('Registration Form')">
             <div id="camera-container">
                 <video id="video" width="100%" height="auto" autoplay></video>
                 <canvas id="canvas" width="300" height="300"></canvas>
@@ -26,151 +40,200 @@
 
 {% block scripts %}
 <script>
+    // Existing camera code
     const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const cameraContainer = document.getElementById('camera-container');
-        const registerForm = document.getElementById('register-form');
-        const messageDiv = document.getElementById('message');
+    const canvas = document.getElementById('canvas');
+    const cameraContainer = document.getElementById('camera-container');
+    const registerForm = document.getElementById('register-form');
+    const messageDiv = document.getElementById('message');
 
-        let capturedImage = null;
-        let clickTimer = null;
-        let isCapturing = false;
+    let capturedImage = null;
+    let clickTimer = null;
+    let isCapturing = false;
+    let canSpeak = true; // For the speech timeout functionality
 
-        // Access the camera and start the video stream
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
-                video.srcObject = stream;
-            })
-            .catch((err) => {
-                console.log('Error accessing camera: ' + err);
-                messageDiv.innerText = 'Camera not accessible. Please check permissions.';
-                messageDiv.classList.add('error');
+    // Speech function with 5-second timeout
+    function speak(text) {
+        if (canSpeak) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.rate = 1;
+
+            window.speechSynthesis.speak(speech);
+
+            // Disable speaking for 5 seconds
+            canSpeak = false;
+
+            // Re-enable speaking after 5 seconds
+            setTimeout(() => {
+                canSpeak = true;
+            }, 5000);
+        }
+    }
+
+    // Display messages in a consistent way
+    function showMessage(type, message) {
+        // Clear any existing message classes
+        messageDiv.classList.remove('success', 'error', 'processing', 'info');
+
+        // Set the message text
+        messageDiv.innerText = message;
+
+        // Add the appropriate class
+        messageDiv.classList.add(type);
+
+        // Add speech functionality if needed
+        if (typeof speak === 'function') {
+            speak(message);
+        }
+
+        // Optionally auto-remove certain message types after a delay
+        if (type !== 'error') {
+            setTimeout(() => {
+                messageDiv.innerText = '';
+                messageDiv.classList.remove(type);
+            }, 5000);
+        }
+    }
+
+    // Access the camera and start the video stream
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            video.srcObject = stream;
+        })
+        .catch((err) => {
+            console.log('Error accessing camera: ' + err);
+            showMessage('error', 'Camera not accessible. Please check permissions.');
+        });
+
+    // Capture image from the video stream
+    function captureImage() {
+        if (!video.srcObject) {
+            showMessage('error', 'Please enable the camera.');
+            return;
+        }
+
+        // Update canvas size to match video dimensions for better quality
+        const videoWidth = video.videoWidth;
+        const videoHeight = video.videoHeight;
+        canvas.width = videoWidth;
+        canvas.height = videoHeight;
+
+        cameraContainer.classList.add('scanning');
+        showMessage('processing', 'Capturing your face...');
+
+        // Add delay for visual effect
+        setTimeout(() => {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedImage = canvas.toDataURL('image/jpeg');
+
+            cameraContainer.classList.remove('scanning');
+            showMessage('success', 'Face captured successfully! Double-click to register.');
+        }, 1000);
+    }
+
+    // Handle form submission
+    async function submitRegistration() {
+        if (!capturedImage) {
+            showMessage('error', 'Please capture your face first (single click).');
+            return;
+        }
+
+        function generateRandomText(length = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        const randomText = generateRandomText();
+
+        const formData = new FormData();
+        formData.append('username', randomText);
+        formData.append('face_image', capturedImage);
+
+        try {
+            showMessage('processing', 'Processing registration...');
+            cameraContainer.classList.add('scanning');
+
+            const response = await fetch('/accounts/register/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             });
 
-        // Capture image from the video stream
-        function captureImage() {
-            if (!video.srcObject) {
-                messageDiv.innerText = "Please enable the camera.";
-                messageDiv.classList.add('error');
-                return;
-            }
-            
-            // Update canvas size to match video dimensions for better quality
-            const videoWidth = video.videoWidth;
-            const videoHeight = video.videoHeight;
-            canvas.width = videoWidth;
-            canvas.height = videoHeight;
-            
-            cameraContainer.classList.add('scanning');
-            messageDiv.innerText = "Capturing your face...";
-            messageDiv.classList.add('processing');
-            
-            // Add delay for visual effect
-            setTimeout(() => {
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                capturedImage = canvas.toDataURL('image/jpeg');
-                
-                cameraContainer.classList.remove('scanning');
-                messageDiv.innerText = "Face captured successfully! Double-click to register.";
-                messageDiv.classList.remove('processing');
-                messageDiv.classList.add('success');
-            }, 1000);
-        }
+            const data = await response.json();
 
-        // Handle form submission
-        async function submitRegistration() {
-            if (!capturedImage) {
-                messageDiv.innerText = "Please capture your face first (single click).";
-                messageDiv.classList.add('error');
-                return;
-            }
+            if (data.status === 'success') {
+                showMessage('success', data.message + " Redirecting to login...");
 
-            function generateRandomText(length = 8) {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                let result = '';
-                for (let i = 0; i < length; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                // Stop the video stream
+                const stream = video.srcObject;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
                 }
-                return result;
+
+                // Add delay before redirect
+                setTimeout(() => {
+                    window.location.href = '/accounts/login/';
+                }, 2000);
             }
+            else if (data.status === 'exists') {
+                // Handle the case when face already exists
+                showMessage('info', data.message + " Redirecting to login...");
 
-            const randomText = generateRandomText();
-
-            const formData = new FormData();
-            formData.append('username', randomText);
-            formData.append('face_image', capturedImage);
-
-            try {
-                messageDiv.innerText = "Processing registration...";
-                messageDiv.classList.remove('success', 'error');
-                messageDiv.classList.add('processing');
-                cameraContainer.classList.add('scanning');
-
-                const response = await fetch('/accounts/register/', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    messageDiv.innerText = data.message + " Redirecting to login...";
-                    messageDiv.classList.remove('processing');
-                    messageDiv.classList.add('success');
-                    
-                    // Stop the video stream
-                    const stream = video.srcObject;
-                    if (stream) {
-                        stream.getTracks().forEach(track => track.stop());
-                    }
-
-                    // Add delay before redirect
-                    setTimeout(() => {
-                        window.location.href = '/accounts/login/';
-                    }, 2000);
-                } else {
-                    messageDiv.innerText = data.message || "Registration failed. Please try again.";
-                    messageDiv.classList.remove('processing');
-                    messageDiv.classList.add('error');
-                    cameraContainer.classList.remove('scanning');
+                // Stop the video stream
+                const stream = video.srcObject;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                messageDiv.innerText = 'An error occurred during registration.';
-                messageDiv.classList.remove('processing');
-                messageDiv.classList.add('error');
+
+                // Redirect to login page after a short delay
+                setTimeout(() => {
+                    window.location.href = '/accounts/login/';
+                }, 2000);
+            }
+            else {
+                showMessage('error', data.message || "Registration failed. Please try again.");
                 cameraContainer.classList.remove('scanning');
             }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('error', 'An error occurred during registration.');
+            cameraContainer.classList.remove('scanning');
         }
+    }
 
-        // Set up click handling for the camera container
-        cameraContainer.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            if (clickTimer === null) {
-                clickTimer = setTimeout(function() {
-                    clickTimer = null;
-                    // Single click action
-                    captureImage();
-                }, 300);
-            }
-        });
+    // Set up click handling for the camera container
+    cameraContainer.addEventListener('click', function (e) {
+        e.preventDefault();
 
-        // Handle double click
-        cameraContainer.addEventListener('dblclick', function(e) {
-            e.preventDefault();
-            clearTimeout(clickTimer);
-            clickTimer = null;
-            // Double click action
-            submitRegistration();
-        });
+        if (clickTimer === null) {
+            clickTimer = setTimeout(function () {
+                clickTimer = null;
+                // Single click action
+                captureImage();
+            }, 300);
+        }
+    });
 
-        // Handle form submission (prevent default)
-        registerForm.onsubmit = (e) => {
-            e.preventDefault();
-        };
+    // Handle double click
+    cameraContainer.addEventListener('dblclick', function (e) {
+        e.preventDefault();
+        clearTimeout(clickTimer);
+        clickTimer = null;
+        // Double click action
+        submitRegistration();
+    });
+
+    // Handle form submission (prevent default)
+    registerForm.onsubmit = (e) => {
+        e.preventDefault();
+    };
 </script>
-<script src="{% static 'voice-navigation.js' %}"></script>
-<script src="{% static 'voice-feedback.js' %}"></script>
 {% endblock %}

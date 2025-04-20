@@ -26,16 +26,25 @@ function startVoiceRecognition() {
 // Function to handle recognized voice commands
 function handleVoiceCommand(command) {
     const actions = {
-        'home': '/',
-        'about': '/about/',
-        'contact': '/contact/',
+        'alphabet': '/content/home/basics/alphabet/',
+        'numbers': '/content/home/basics/number/',
+        'table': '/content/home/basics/table/',
+        'practice': '/content/chatbot/talk/'
     };
 
     // Redirect to the corresponding URL if the command exists
     if (actions[command]) {
+        speak("Redirecting to ", command)
         window.location.href = actions[command];
     }
 }
 
 // Start voice recognition when the page loads
 window.onload = startVoiceRecognition;
+
+function speak(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';
+    speech.rate = 1;
+    window.speechSynthesis.speak(speech);
+}
