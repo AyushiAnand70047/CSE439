@@ -8,23 +8,9 @@
 <link rel="stylesheet" href="{% static 'register.css' %}">
 {% endblock %}
 
-<style>
-    .disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    #countdown {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #666;
-    }
-</style>
-
 {% block content %}
 
-<body id="speakButton"
-    onclick="speak('Registration page')">
+<body>
     <div class="register-container" onclick="event.stopPropagation()">
         <h2>Register with Face Recognition</h2>
         <form id="register-form" onmouseover="speak('Registration Form')">
